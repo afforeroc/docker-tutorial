@@ -198,7 +198,7 @@ $ docker start fef
 ```
 
 
-### 5. Upload image and container to IBM Cloud using Container Registry
+### 5. Upload the image/container to IBM Cloud using Container Registry
 5.1 Login on IBM Cloud.
 ```
 $ ibmcloud login
@@ -231,58 +231,89 @@ us.icr.io/isa-development/python-hello-world   latest   4db3383677ab   isa-devel
 OK
 ```
 
-### 6. Kubernetes
-6.1 Create a new cluster on IBM Cloud using Kubernetes Service.
-<screenshot>
+### 6. Accessing your cluster
+6.1 Create a free cluster on IBM Cloud using Kubernetes Service.
+<screenshot 1>
 
-6.2 Check the nodes of the cluster.
+6.2  Log in to your IBM Cloud account.
+```
+$ ibmcloud login -a cloud.ibm.com -r us-south -g Default
+```
+
+6.3 Copy the ID of cluster that was created.
+<screenshot 2>
+
+6.4 Set the Kubernetes context to your cluster for this terminal session.
+```
+$ ibmcloud ks cluster config --cluster bv5h24ed0tnfajgq5sig
+
+OK
+The configuration for bv5h24ed0tnfajgq5sig was downloaded successfully.
+
+Added context for bv5h24ed0tnfajgq5sig to the current kubeconfig file.
+You can now execute 'kubectl' commands against your cluster. For example, run 'kubectl get nodes'.
+If you are accessing the cluster for the first time, 'kubectl' commands might fail for a few seconds while RBAC synchronizes
+```
+
+6.5 Verify that you can connect to your cluster.
+```
+$ kubectl config current-context
+
+mycluster-free/bv5h24ed0tnfajgq5sig
+```
+
+6.6 Try to verify the state of cluster.
 ```
 $ kubectl get nodes
+
+NAME           STATUS   ROLES    AGE   VERSION
+10.131.79.71   Ready    <none>   22m   v1.18.12+IKS
+```
+> Remember if you have some errors, be patient and remember: *If you are accessing the cluster for the first time, 'kubectl' commands might fail for a few seconds while RBAC synchronizes.*
+
+### 7. Deploy the container on the Kubernetes cluster 
+7.1 Make the deployment.
+```
+$ kubectl create deployment python-hello-world --image=us.icr.io/isa-development/python-hello-world:latest
+
+deployment.apps/python-hello-world created
 ```
 
-6.3 Deploy the container from Container Registry into the cluster.
-```
-$ kubectl run python-hello-world --image=us.icr.io/isa-development/python-hello-world:latest
-```
-
-6.4 Check the pods of the cluster.
+7.2 Check the status of the running application.
 ```
 $ kubectl get pods
+
+NAME                                  READY   STATUS    RESTARTS   AGE
+python-hello-world-7d67f9d5fc-rgmcr   1/1     Running   0          16s
 ```
 
-6.5 Check the health of container.
-```
-$ kubectl logs python-hello-world
-
- * Serving Flask app "app" (lazy loading)
- * Environment: production
-   WARNING: This is a development server. Do not use it in a production deployment.
-   Use a production WSGI server instead.
- * Debug mode: off
- * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
-```
-
-```
-$ kubectl create deployment python-hello-world --image=us.icr.io/development-space/python-hello-world:latest
-```
-
+7.3 Expose that deployment as a service so we can access it through the IP of the worker nodes.
 ```
 $ kubectl expose deployment/python-hello-world --type=NodePort --port=5000 --name=python-hello-world-service --target-port=5000
+
+service/python-hello-world-service exposed
 ```
 
+7.4 Find the port used on that worker node, examine your new service.
+kubectl get service guestbook
 ```
-$ kubectl describe service python-hello-world-service
-```
+$ kubectl get service python-hello-world-service
 
+NAME                         TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+python-hello-world-service   NodePort   172.21.229.209   <none>        5000:31674/TCP   4m46s
 ```
-$ ibmcloud ks workers --cluster bv3ueakd07n541nsceh0
+We can see that our <nodeport> is 31674.
+
+7.5
+```
+$ kubectl get nodes -o wide
 ```
 
 ## Reference Links
-* [Docker Docs - Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
+* [Docker Docs - Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+* [Docker Docs - Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)
 * [Stack Overflow - Can't install pip packages inside a docker container with Ubuntu](https://stackoverflow.com/questions/28668180/cant-install-pip-packages-inside-a-docker-container-with-ubuntu)
+* [eduonix - Learn How To Stop, Kill And Clean Up Docker Containers](https://blog.eduonix.com/software-development/learn-stop-kill-clean-docker-containers/)
 * [IBM - docker 101: Lab 2](https://ibm-developer.gitbook.io/docker101/docker-101/lab-2)
 * [IBM Cloud - Adding images to your namespace](https://cloud.ibm.com/docs/Registry?topic=Registry-registry_images_)
-* [Docker Docs - Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/.)
-* [eduonix - Learn How To Stop, Kill And Clean Up Docker Containers](https://blog.eduonix.com/software-development/learn-stop-kill-clean-docker-containers/)
-* [IBM Developer - Containerization: Starting with Docker and IBM Cloud](https://developer.ibm.com/tutorials/building-docker-images-locally-and-in-cloud/)
+* [IBM - kube101: Lab 1. Deploy your first application](https://github.com/IBM/kube101/tree/master/workshop/Lab1)
