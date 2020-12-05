@@ -198,58 +198,61 @@ $ docker start fef
 ```
 
 
-### 5. Deploy on IBM Cloud using Container Registry
-4.1 Login on IBM Cloud.
+### 5. Upload image and container to IBM Cloud using Container Registry
+5.1 Login on IBM Cloud.
 ```
 $ ibmcloud login
 ```
 
-4.2 Login on Container Registry service.
+5.2 Login on Container Registry service.
 ```
 $ ibmcloud cr login
 ```
 
-4.3 Create a Container Registry name-space.
+5.3 Create a Container Registry name-space.
 ```
-$ ibmcloud cr namespace-add development-space
-```
-
-4.4 Build and push the container.
-```
-$ ibmcloud cr build --tag registry.ng.bluemix.net/development-space/python-hello-world:1 .
+$ ibmcloud cr namespace-add isa-development
 ```
 
-4.5 Verify the pushed image.
+5.4 Build and push the container.
+```
+$ ibmcloud cr build --tag registry.ng.bluemix.net/isa-development/python-hello-world:latest .
+```
+
+5.5 Verify the uploaded image.
 ```
 $ ibmcloud cr image-list
 
 Listing images...
 
-Repository                                       Tag   Digest         Namespace           Created          Size    Security status   
-us.icr.io/development-space/python-hello-world   1     54a510cbe947   development-space   13 minutes ago   34 MB   25 Issues   
+Repository                                     Tag      Digest         Namespace         Created          Size    Security status   
+us.icr.io/isa-development/python-hello-world   latest   4db3383677ab   isa-development   28 seconds ago   23 MB   Scanning...   
 
 OK
 ```
 
-### 5.1
+### 6. Kubernetes
+6.1 Create a new cluster on IBM Cloud using Kubernetes Service.
+<screenshot>
+
+6.2 Check the nodes of the cluster.
 ```
 $ kubectl get nodes
 ```
 
+6.3 Deploy the container from Container Registry into the cluster.
 ```
-$ kubectl run python-hello-world4 --image=us.icr.io/development-space/python-hello-world:2
+$ kubectl run python-hello-world --image=us.icr.io/isa-development/python-hello-world:latest
 ```
 
+6.4 Check the pods of the cluster.
 ```
 $ kubectl get pods
 ```
 
+6.5 Check the health of container.
 ```
-$ kubectl logs python-hello-world5
-```
-
-```
-$ kubectl logs python-hello-world5
+$ kubectl logs python-hello-world
 
  * Serving Flask app "app" (lazy loading)
  * Environment: production
@@ -260,7 +263,7 @@ $ kubectl logs python-hello-world5
 ```
 
 ```
-$ kubectl create deployment python-hello-world --image=us.icr.io/development-space/python-hello-world:2
+$ kubectl create deployment python-hello-world --image=us.icr.io/development-space/python-hello-world:latest
 ```
 
 ```
