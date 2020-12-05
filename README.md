@@ -294,7 +294,7 @@ $ kubectl expose deployment/python-hello-world --type=NodePort --port=5000 --nam
 service/python-hello-world-service exposed
 ```
 
-7.4 Find the port used on that worker node, examine your new service.
+7.4 Find the port used on that worker node.
 kubectl get service guestbook
 ```
 $ kubectl get service python-hello-world-service
@@ -302,12 +302,19 @@ $ kubectl get service python-hello-world-service
 NAME                         TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 python-hello-world-service   NodePort   172.21.229.209   <none>        5000:31674/TCP   4m46s
 ```
-We can see that our <nodeport> is 31674.
+nodeport is 31674
 
-7.5
+7.5 Find the External IP.
 ```
 $ kubectl get nodes -o wide
+
+NAME           STATUS   ROLES    AGE   VERSION        INTERNAL-IP    EXTERNAL-IP    OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+10.131.79.71   Ready    <none>   32m   v1.18.12+IKS   10.131.79.71   169.57.42.18   Ubuntu 16.04.7 LTS   4.4.0-194-generic   containerd://1.3.4
 ```
+public-IP is 169.57.42.18
+
+7.6 Construct the address and the port to access the application in the web browser.
+URL is [169.57.42.18:31674](http://169.57.42.18:31674/)
 
 ## Reference Links
 * [Docker Docs - Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
