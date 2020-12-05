@@ -13,19 +13,41 @@
 ### Pre-requisites
 * Get a [IBM Cloud account](https://cloud.ibm.com/login).
 
-### 1. Install Docker Engine
-1.1 Update the apt package index and install packages to allow apt to use a repository over HTTPS.
+### 1. Install Python, PIP an Flask
+1.1 Install [Python](https://www.python.org/).
+```
+$ sudo apt install python3
+```
+```
+$ python3 --version
+```
+
+1.2 Install [PIP](https://pypi.org/project/pip/).
+```
+$ sudo apt install python3-pip
+```
+```
+$ pip3 --version
+```
+
+1.3 Install [Flask]()
+```
+$ sudo pip3 install flask
+```
+
+### 2. Install Docker Engine
+2.1 Update the apt package index and install packages to allow apt to use a repository over HTTPS.
 ```
 $ sudo apt-get update
 $ sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 ```
 
-1.2 Add Docker’s official GPG key
+2.2 Add Docker’s official GPG key
 ```
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $ sudo apt-key add -
 ```
 
-1.3 Verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88, by searching for the last 8 characters of the fingerprint.
+2.3 Verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88, by searching for the last 8 characters of the fingerprint.
 ```
 $ sudo apt-key fingerprint 0EBFCD88
 
@@ -35,18 +57,18 @@ uid           [ unknown] Docker Release (CE deb) <docker@docker.com>
 sub   rsa4096 2017-02-22 [S]
 ```
 
-1.4 Use the following command to set up the stable repository.
+2.4 Use the following command to set up the stable repository.
 ```
 $ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 ```
 
-1.5 Install Docker Engine.
+2.5 Install Docker Engine.
 ```
 $ sudo apt update
 $ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 
-1.6 To install a specific version of Docker Engine, list the available versions in the repo, then select and install.
+2.6 To install a specific version of Docker Engine, list the available versions in the repo, then select and install.
 ```
 $ apt-cache madison docker-ce
 
@@ -58,17 +80,17 @@ docker-ce | 5:19.03.9~3-0~ubuntu-focal | https://download.docker.com/linux/ubunt
 ...
 ```
 
-1.7  Install a specific version using the version string from the second column, for example, ```5:19.03.13~3-0~ubuntu-focal```.
+2.7  Install a specific version using the version string from the second column, for example, ```5:19.03.13~3-0~ubuntu-focal```.
 ```
 $ sudo apt-get install docker-ce=5:19.03.13~3-0~ubuntu-focal docker-ce-cli=5:19.03.13~3-0~ubuntu-focal containerd.io
 ```
 
-1.8 Start Docker.
+2.8 Start Docker.
 ```
 $ sudo /etc/init.d/docker start
 ```
 
-1.9 Verify that Docker Engine is installed correctly by running the hello-world image.
+2.9 Verify that Docker Engine is installed correctly by running the hello-world image.
 ```
 $ sudo docker run hello-world
 
@@ -94,47 +116,25 @@ For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
 
-## 2. Manage Docker as a non-root user
-2.1 Create the docker group.
+## 3. Manage Docker as a non-root user
+3.1 Create the docker group.
 ```
-sudo groupadd docker
+$ sudo groupadd docker
 ```
 
-2.2 Add your user to the docker group.
+3.2 Add your user to the docker group.
 ```
 $ sudo usermod -aG docker $USER
 ```
 
-2.3 Log out and log back in so that your group membership is re-evaluated.
+3.3 Log out and log back in so that your group membership is re-evaluated.
 ```
 $ newgrp docker
 ```
 
-2.4 Verify that you can run docker commands without sudo.
+3.4 Verify that you can run docker commands without sudo.
 ```
 $ docker run hello-world
-```
-
-### 3. Install Python, PIP an Flask
-3.1 Install [Python](https://www.python.org/).
-```
-$ sudo apt install python3
-```
-```
-$ python3 --version
-```
-
-3.2 Install [PIP](https://pypi.org/project/pip/).
-```
-$ sudo apt install python3-pip
-```
-```
-$ pip3 --version
-```
-
-3.3 Install [Flask]()
-```
-$ sudo pip3 install flask
 ```
 
 ### 4. Create, build and run a local container
@@ -165,33 +165,40 @@ $ docker images
 
 4.4 Run the Docker image.
 ```
-$ docker run -p 5001:5000 -d python-hello-world
+$ docker run -p 5000:5000 -d python-hello-world
 
-0b2ba61df37fb4038d9ae5d145740c63c2c211ae2729fc27dc01b82b5aaafa26
+fef018a4106c459aeb02a94ff43b2add7bfb7d6613874802fbc859c7292da659
 ```
 
-4.5 Go to [localhost:5001]http://localhost:5001/). You should see this message.
+4.5 Check the container is running.
+```
+$ docker ps -a
+
+CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS              PORTS                    NAMES
+fef018a4106c        python-hello-world   "python app.py"     28 seconds ago      Up 26 seconds       0.0.0.0:5000->5000/tcp   nervous_black
+```
+
+4.6 Go to [localhost:5000](http://localhost:5000/). You should see this message.
 ```
 hello world!
 ```
 
-4.6 Stop the container app.
-```
-$ docker ps
+4.7 If you need pause, stop or start the container.
 
-CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS              PORTS                    NAMES
-fff512a09845        python-hello-world   "python app.py"     2 hours ago         Up 2 hours          0.0.0.0:5001->5000/tcp   xenodochial_hamilton
+```
+$ docker pause fef
 ```
 
 ```
-$ docker pause fff
+$ docker stop fef
+```
 
-CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS                PORTS                    NAMES
-fff512a09845        python-hello-world   "python app.py"     2 hours ago         Up 2 hours (Paused)   0.0.0.0:5001->5000/tcp   xenodochial_hamilton
+```
+$ docker start fef
 ```
 
 
-### 4. Deploy on IBM Cloud using Container Registry
+### 5. Deploy on IBM Cloud using Container Registry
 4.1 Login on IBM Cloud.
 ```
 $ ibmcloud login
